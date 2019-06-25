@@ -1,0 +1,16 @@
+<resources>
+    <declare-styleable name="CTextView">
+        <attr name="CRotateDegree" format="integer"/>
+        <attr name="CPressedColor" format="color"/>
+        <attr name="CPressedTextColor" format="color"/>
+        <attr name="CClickTextColor" format="color"/>
+        <attr name="CSolidColor" format="color"/>
+        <attr name="CStrokeColor" format="color"/>
+        <attr name="CAngleCorner" format="dimension"/>
+        <attr name="CStrokeWidth" format="dimension"/>
+        <attr name="CDrawablePadding" format="dimension"/>
+        <attr name="CSpecialTextReg" format="string"/>
+        <attr name="CSpecialTextSize" format="dimension"/>
+        <attr name="CSpecialTextColor" format="color"/>
+    </declare-styleable>
+</resources>
