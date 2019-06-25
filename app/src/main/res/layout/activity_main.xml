@@ -10,7 +10,8 @@
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="测试一下"
+        android:textColor="@android:color/white"
         app:CAngleCorner="2dp"
-        app:CStrokeColor="@color/colorAccent" />
+        app:CSolidColor="@color/colorAccent" />
 
 </LinearLayout>
