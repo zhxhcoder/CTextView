@@ -9,11 +9,22 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by zhxh on 2019/06/25
@@ -23,12 +34,11 @@ public final class CTextView extends TextView {
     GradientDrawable gradientDrawable;
 
     //关键属性设置
-    private int solidColor = Color.TRANSPARENT;
+    private int cSolidColor = Color.TRANSPARENT;
     private int strokeColor = Color.TRANSPARENT;
     private int pressedColor = Color.TRANSPARENT;
     private int pressedTextColor = Color.TRANSPARENT;
     private int clickTextColor = Color.TRANSPARENT;
-    private int textColorAnimEnd = Color.TRANSPARENT;
     private int angleCorner = 0;
     private int strokeWidth = 0;
 
@@ -40,24 +50,15 @@ public final class CTextView extends TextView {
     Rect bounds;
     int drawablePadding = 0;
 
+
+    private int degrees;
+
     enum DrawablePosition {
         NONE,
         LEFT_AND_RIGHT,
         LEFT,
         RIGHT
     }
-
-    boolean isTouchPass = true;
-
-    //动画
-    boolean isClickAnim;
-    boolean isAnimComplete;
-
-    private float animatedValue;
-    private int drawableStart;
-    private int drawableEnd;
-    private float clickAnimTime = 500;
-    ClickAnimAction clickAnimAction;
 
     public CTextView(Context context) {
         this(context, null);
@@ -79,11 +80,12 @@ public final class CTextView extends TextView {
         pressedColor = a.getColor(R.styleable.CTextView_CPressedColor, pressedColor);
         pressedTextColor = a.getColor(R.styleable.CTextView_CPressedTextColor, pressedTextColor);
         clickTextColor = a.getColor(R.styleable.CTextView_CClickTextColor, clickTextColor);
-        solidColor = a.getColor(R.styleable.CTextView_CSolidColor, solidColor);
+        cSolidColor = a.getColor(R.styleable.CTextView_CSolidColor, cSolidColor);
         strokeColor = a.getColor(R.styleable.CTextView_CStrokeColor, strokeColor);
         angleCorner = a.getDimensionPixelSize(R.styleable.CTextView_CAngleCorner, angleCorner);
         strokeWidth = a.getDimensionPixelSize(R.styleable.CTextView_CStrokeWidth, strokeWidth);
         drawablePadding = a.getDimensionPixelSize(R.styleable.CTextView_CDrawablePadding, drawablePadding);
+        degrees = a.getDimensionPixelSize(R.styleable.CTextView_CRotateDegree, degrees);
 
         defaultTextColor = this.getCurrentTextColor();
 
@@ -93,14 +95,15 @@ public final class CTextView extends TextView {
         if (clickTextColor == Color.TRANSPARENT) {
             clickTextColor = defaultTextColor;
         }
-        if (textColorAnimEnd == Color.TRANSPARENT) {
-            textColorAnimEnd = defaultTextColor;
-        }
 
         if (pressedColor == Color.TRANSPARENT) {
-            if (solidColor != Color.TRANSPARENT) {
-                pressedColor = solidColor;
+            if (cSolidColor != Color.TRANSPARENT) {
+                pressedColor = cSolidColor;
             }
+        }
+
+        if (drawablePadding != 0) {
+            this.setGravity(Gravity.CENTER);
         }
 
         if (null == bounds) {
@@ -110,15 +113,11 @@ public final class CTextView extends TextView {
             gradientDrawable = new GradientDrawable();
         }
 
-        setGravity(Gravity.CENTER);
         setDrawablePadding(drawablePadding);
         setBtnDrawable();
 
         //设置按钮点击之后的颜色更换
         setOnTouchListener((arg0, event) -> {
-            if (isClickAnim) {
-                return false;
-            }
             setBackgroundDrawable(gradientDrawable);
             return setColor(event.getAction());
         });
@@ -153,11 +152,11 @@ public final class CTextView extends TextView {
 
         switch (position) {
             case LEFT:
-                setPadding(horizontalPadding, getPaddingTop(), 0, getPaddingBottom());
+                setPadding(horizontalPadding, getPaddingTop(), getPaddingRight(), getPaddingBottom());
                 break;
 
             case RIGHT:
-                setPadding(0, getPaddingTop(), horizontalPadding, getPaddingBottom());
+                setPadding(getPaddingLeft(), getPaddingTop(), horizontalPadding, getPaddingBottom());
                 break;
 
             case LEFT_AND_RIGHT:
@@ -165,7 +164,7 @@ public final class CTextView extends TextView {
                 break;
 
             default:
-                setPadding(0, getPaddingTop(), 0, getPaddingBottom());
+                setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), getPaddingBottom());
         }
     }
 
@@ -187,55 +186,25 @@ public final class CTextView extends TextView {
         } else {
             position = DrawablePosition.NONE;
         }
-
         requestLayout();
     }
 
-    //还原为默认
-    public void reset() {
-        pressedColor = Color.TRANSPARENT;
-        solidColor = Color.TRANSPARENT;
-        strokeColor = Color.TRANSPARENT;
 
-        angleCorner = 0;
-        strokeWidth = 0;
+    public void setGradientColor(GradientDrawable.Orientation orientation, int startColor, int endColor) {
+        gradientDrawable.setColors(new int[]{startColor, endColor});
+        gradientDrawable.setGradientType(GradientDrawable.RECTANGLE);
+        gradientDrawable.setOrientation(orientation);
     }
 
-    public boolean isAnimComplete() {
-        return isAnimComplete;
+    public GradientDrawable getGradientDrawable() {
+        return gradientDrawable;
     }
 
-
-    public void setIsAnimComplete(boolean isAnimComplete) {
-
-        this.isAnimComplete = isAnimComplete;
-
-        if (isAnimComplete) {
-            this.setTextColor(textColorAnimEnd);
-            this.setClickable(false);
-            this.setBackgroundResource(drawableEnd);
-        } else {
-            this.setTextColor(defaultTextColor);
-            this.setClickable(true);
-            this.setBackgroundResource(drawableStart);
-        }
-    }
-
-    public void setAnimDrawable(int drawableStart, int drawableEnd, ClickAnimAction clickAnimAction) {
-        this.isClickAnim = true;
-        this.drawableStart = drawableStart;
-        this.drawableEnd = drawableEnd;
-        this.clickAnimAction = clickAnimAction;
-    }
-
-    public void setTextColorAnimEnd(int textColorAnimEnd) {
-        this.textColorAnimEnd = textColorAnimEnd;
-    }
 
     //除去Angle还原为默认
     public void resetExAngle() {
         pressedColor = Color.TRANSPARENT;
-        solidColor = Color.TRANSPARENT;
+        cSolidColor = Color.TRANSPARENT;
         strokeColor = Color.TRANSPARENT;
 
         strokeWidth = 0;
@@ -248,7 +217,7 @@ public final class CTextView extends TextView {
 
     private void setBtnDrawable() {
         //设置按钮颜色
-        gradientDrawable.setColor(solidColor);
+        gradientDrawable.setColor(cSolidColor);
         //设置按钮的边框宽度
         gradientDrawable.setStroke(strokeWidth, strokeColor);
         //设置按钮圆角大小
@@ -256,13 +225,6 @@ public final class CTextView extends TextView {
         setBackgroundDrawable(gradientDrawable);
     }
 
-
-    //处理按钮点击事件无效
-    @Override
-    public void setOnClickListener(View.OnClickListener l) {
-        super.setOnClickListener(l);
-        isTouchPass = false;
-    }
 
     //处理按下去的颜色 区分solid和stroke模式
     public boolean setColor(int action) {
@@ -272,68 +234,132 @@ public final class CTextView extends TextView {
                 this.setTextColor(pressedTextColor);
                 break;
             case MotionEvent.ACTION_UP:
-                gradientDrawable.setColor(solidColor);
+                gradientDrawable.setColor(cSolidColor);
                 this.setTextColor(defaultTextColor);
                 break;
             case MotionEvent.ACTION_CANCEL:
-                gradientDrawable.setColor(solidColor);
+                gradientDrawable.setColor(cSolidColor);
                 this.setTextColor(defaultTextColor);
                 break;
         }
 
-        return isTouchPass;
+        return false;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        float lastDegrees = degrees % 360;//优化大于360度情况
 
-        if (isClickAnim) {
-            if (isAnimComplete) {
-                this.setBackgroundResource(drawableEnd);
-                this.setClickable(false);
+        if (lastDegrees != 0) {
+            canvas.rotate((-lastDegrees), getMeasuredWidth() / 2, getMeasuredHeight() / 2);
+        }
+        super.onDraw(canvas);
+    }
+
+    private String richTextSrc = "";
+    private String richTextReg = "";
+    private int richValueColor;
+    private int richValueSize;
+
+
+    public CTextView withText(String richTextSrc) {
+        this.richTextSrc = richTextSrc;
+        return this;
+    }
+
+    public CTextView withRegex(String richTextReg) {
+        this.richTextReg = richTextReg;
+        return this;
+    }
+
+    public CTextView withColor(int richValueColor) {
+        this.richValueColor = richValueColor;
+        return this;
+    }
+
+    public CTextView withSize(int richValueSize) {
+        this.richValueSize = richValueSize;
+        return this;
+    }
+
+    public void withBack(ClickAction cb) {
+        setSpecialText(richTextSrc, richTextReg, richValueColor, richValueSize, cb);
+    }
+
+
+    //根据正则用来 处理特殊字符串的特殊颜色或大小及点击事件
+    public void setSpecialText(String richTextSrc, String richTextReg, int richValueColor, int richValueSize, ClickAction cb) {
+        if (TextUtils.isEmpty(richTextSrc) || TextUtils.isEmpty(richTextReg)) {
+            this.setText(richTextSrc);
+            return;
+        }
+        if (richValueColor == 0) {
+            richValueColor = this.getCurrentTextColor();
+        }
+        SpannableString resultSpan = new SpannableString(richTextSrc);
+
+        Pattern p = Pattern.compile(richTextReg);
+        Matcher m = p.matcher(richTextSrc);
+
+        if (m == null) {
+            this.setText(richTextSrc);
+            return;
+        }
+
+        while (m.find()) {
+            resultSpan.setSpan(new ForegroundColorSpan(richValueColor),
+                    m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            if (richValueSize != 0) {
+                resultSpan.setSpan(new AbsoluteSizeSpan(richValueSize, true), m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            if (cb != null) {
+                int finalRichValueColor = richValueColor;
+                resultSpan.setSpan(new ClickableSpan() {
+                    @Override
+                    public void updateDrawState(TextPaint ds) {
+                        super.updateDrawState(ds);
+                        ds.setColor(finalRichValueColor);
+                        ds.setUnderlineText(false);
+                        ds.clearShadowLayer();
+                    }
+
+                    @Override
+                    public void onClick(View widget) {
+
+                        CTextView.this.setHighlightColor(Color.TRANSPARENT);
+                        cb.onClick(m.group());
+
+                    }
+                }, m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-    }
-
-    //对外定义接口
-    public void setPressedColor(int pressedColor) {
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
-    }
-
-    @Override
-    public void setTextColor(int color) {
-        super.setTextColor(color);
-
-        if (pressedTextColor == Color.TRANSPARENT) {
-            pressedTextColor = defaultTextColor;
+        if (cb != null) {
+            this.setMovementMethod(LinkMovementMethod.getInstance());
         }
-        if (clickTextColor == Color.TRANSPARENT) {
-            clickTextColor = defaultTextColor;
-        }
-        if (textColorAnimEnd == Color.TRANSPARENT) {
-            textColorAnimEnd = defaultTextColor;
-        }
+        this.setText(resultSpan);
+        return;
     }
 
-    public void setPressedTextColor(int pressedTextColor) {
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
+
+    public void setMaxLineText(String srcStr, int maxLines, ClickAction greater, ClickAction lesser) {
+        this.setText(srcStr);
+        this.setMaxLines(maxLines);
+        this.post(new Runnable() {
+            @Override
+            public void run() {
+                if (getLineCount() > maxLines) {
+                    greater.onClick(String.valueOf(getLineCount()));
+                } else {
+                    lesser.onClick(String.valueOf(getLineCount()));
+                }
+            }
+        });
     }
 
-    public void setSolidColor(int solidColor) {
 
-        pressedColor = solidColor;
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
-    }
-
-    public void setStrokeColor(int strokeColor) {
-        pressedColor = strokeColor;
-
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
-    }
-
-    public void setBtnAttr(int solidColor, int strokeColor, int pressedColor, int pressedTextColor, int angleCorner, int strokeWidth) {
-        this.solidColor = solidColor;
+    public void initBtnAttr(int solidColor, int strokeColor, int pressedColor, int pressedTextColor, int angleCorner, int strokeWidth) {
+        this.cSolidColor = solidColor;
         this.strokeColor = strokeColor;
         this.pressedColor = pressedColor;
         this.pressedTextColor = pressedTextColor;
@@ -342,42 +368,43 @@ public final class CTextView extends TextView {
         setBtnDrawable();
     }
 
-    //实心的
-    public void setSolidAttr(int solidColor, int pressedColor, int angleCorner) {
+
+    //初始化 默认
+    public void initSolidArr(int textColor, int solidColor, int angleCorner) {
         resetExAngle();
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
+        initBtnAttr(solidColor, strokeColor, solidColor, textColor, angleCorner, strokeWidth);
+        setTextColor(textColor);
     }
 
-    public void setSolidAttr(int solidColor, int angleCorner) {
+
+    //初始化空心的
+    public void initStrokeAttr(int textColor, int strokeColor, int pressedColor, int strokeWidth, int angleCorner) {
         resetExAngle();
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
+        initBtnAttr(cSolidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
+        setTextColor(textColor);
     }
 
-    public void setSolidAttr(int solidColor) {
+    //stockColor等于textColor等于pressColor等于pressTextColor
+    public void initStrokeAttr(int strokeColor, int strokeWidth, int angleCorner) {
         resetExAngle();
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
+        initBtnAttr(cSolidColor, strokeColor, pressedColor, strokeColor, angleCorner, strokeWidth);
+        setTextColor(strokeColor);
     }
 
-    //空心的
-    public void setStrokeAttr(int strokeColor, int pressedColor, int strokeWidth, int angleCorner) {
-        resetExAngle();
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
+    @Override
+    public void setTextColor(int color) {
+        super.setTextColor(color);
+        defaultTextColor = color;
+
+        if (pressedTextColor == Color.TRANSPARENT) {
+            pressedTextColor = defaultTextColor;
+        }
+        if (clickTextColor == Color.TRANSPARENT) {
+            clickTextColor = defaultTextColor;
+        }
     }
 
-    public void setStrokeAttr(int strokeColor, int strokeWidth, int angleCorner) {
-        resetExAngle();
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
+    public interface ClickAction {
+        void onClick(String s);
     }
-
-    public void setStrokeAttr(int strokeColor, int strokeWidth) {
-        resetExAngle();
-        setBtnAttr(solidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
-    }
-
-
-    public interface ClickAnimAction {
-        void onAnimFinished();
-    }
-
-
 }

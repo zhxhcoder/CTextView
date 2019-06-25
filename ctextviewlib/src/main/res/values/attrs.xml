@@ -9,8 +9,5 @@
         <attr name="CAngleCorner" format="dimension"/>
         <attr name="CStrokeWidth" format="dimension"/>
         <attr name="CDrawablePadding" format="dimension"/>
-        <attr name="CSpecialTextReg" format="string"/>
-        <attr name="CSpecialTextSize" format="dimension"/>
-        <attr name="CSpecialTextColor" format="color"/>
     </declare-styleable>
 </resources>
