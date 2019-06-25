@@ -1,6 +1,5 @@
 package com.creditease.ctextview
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -21,6 +20,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
 import java.text.ParseException
 import java.text.ParsePosition
 import java.text.SimpleDateFormat
@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat
  * 7，多行展示的监听
  */
 class CTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
-    android.support.v7.widget.AppCompatTextView(context, attrs, defStyleAttr) {
+    TextView(context, attrs, defStyleAttr) {
     private var gradientDrawable: GradientDrawable? = null
 
     //关键属性设置
@@ -75,7 +75,6 @@ class CTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         init(context, attrs)
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun init(context: Context, attrs: AttributeSet?) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.CTextView)
         pressedColor = a.getColor(R.styleable.CTextView_CPressedColor, pressedColor)
@@ -175,7 +174,6 @@ class CTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
     }
 
-
     //重新设置位置
     override fun setCompoundDrawablesWithIntrinsicBounds(
         left: Drawable?,
@@ -201,6 +199,9 @@ class CTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         requestLayout()
     }
 
+    /**
+     * 设置渐进色
+     */
     fun setGradientColor(orientation: GradientDrawable.Orientation, startColor: Int, endColor: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             gradientDrawable?.colors = intArrayOf(startColor, endColor)
@@ -496,10 +497,6 @@ class CTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         /**
          * yyyy-MM-dd HH:mm:ss
          * yyyy/MM/dd HH:mm:ss
-         *
-         * @param s
-         * @param offset
-         * @return 判断是否为
          */
         fun strToTimeStamp(s: String, offset: Int): Long {
             //数据长度验证
@@ -519,7 +516,6 @@ class CTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         /**
          * yyyy-MM-dd HH:mm:ss
          * yyyy/MM/dd HH:mm:ss
-         *
          * @return 判断是否为
          */
         fun isValidDate(str: String): Boolean {
