@@ -1,1 +1,1 @@
-include ':app', ':ctextview'
+include ':app', ':ctextviewlib'
