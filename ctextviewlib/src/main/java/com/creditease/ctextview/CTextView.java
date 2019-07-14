@@ -76,6 +76,7 @@ public final class CTextView extends TextView {
 
     @SuppressLint("ClickableViewAccessibility")
     private void init(Context context, AttributeSet attrs) {
+        this.setEnabled(false); //默认不可用 当注册点击事件
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CTextView);
         pressedColor = a.getColor(R.styleable.CTextView_CPressedColor, pressedColor);
         pressedTextColor = a.getColor(R.styleable.CTextView_CPressedTextColor, pressedTextColor);
@@ -283,9 +284,15 @@ public final class CTextView extends TextView {
     }
 
     public void withBack(ClickAction cb) {
+        this.setEnabled(true);
         setSpecialText(richTextSrc, richTextReg, richValueColor, richValueSize, cb);
     }
 
+    @Override
+    public void setOnClickListener(View.OnClickListener l) {
+        this.setEnabled(true);
+        super.setOnClickListener(l);
+    }
 
     //根据正则用来 处理特殊字符串的特殊颜色或大小及点击事件
     public void setSpecialText(String richTextSrc, String richTextReg, int richValueColor, int richValueSize, ClickAction cb) {
