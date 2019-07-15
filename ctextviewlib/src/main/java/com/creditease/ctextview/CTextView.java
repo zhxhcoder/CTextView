@@ -268,6 +268,11 @@ public final class CTextView extends TextView {
         return this;
     }
 
+    public CTextView withTextColor(int textColor) {
+        this.setTextColor(textColor);
+        return this;
+    }
+
     public CTextView withRegex(String richTextReg) {
         this.richTextReg = richTextReg;
         return this;
@@ -315,7 +320,7 @@ public final class CTextView extends TextView {
 
         while (m.find()) {
             resultSpan.setSpan(new ForegroundColorSpan(richValueColor),
-                    m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             if (richValueSize != 0) {
                 resultSpan.setSpan(new AbsoluteSizeSpan(richValueSize, true), m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
