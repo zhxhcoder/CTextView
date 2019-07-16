@@ -127,9 +127,16 @@ public final class CTextView extends TextView {
         a.recycle();
     }
 
+
+    int freezeTime = 500;
+
+    public void setFreezeTime(int freezeTime) {
+        this.freezeTime = freezeTime;
+    }
+
     @Override
     public boolean performClick() {
-        if (BtnUtils.isQuickClick()) {
+        if (BtnUtils.isQuickClick(freezeTime)) {
             return true;
         }
         return super.performClick();

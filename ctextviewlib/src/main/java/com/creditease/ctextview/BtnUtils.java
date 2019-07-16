@@ -7,9 +7,9 @@ public final class BtnUtils {
 
     private static long lastClickTime;
 
-    public synchronized static boolean isQuickClick() {
+    public synchronized static boolean isQuickClick(int freezeTime) {
         long time = System.currentTimeMillis();
-        if (time - lastClickTime < 500) {
+        if (time - lastClickTime < freezeTime) {
             return true;
         }
         lastClickTime = time;
