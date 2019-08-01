@@ -314,7 +314,10 @@ public final class CTextView extends TextView {
 
     //根据正则用来 处理特殊字符串的特殊颜色或大小及点击事件
     public void setSpecialText(String richTextSrc, String richTextReg, int richValueColor, int richValueSize, ClickAction cb) {
-        if (TextUtils.isEmpty(richTextSrc) || TextUtils.isEmpty(richTextReg)) {
+        if (isEmpty(richTextSrc)) {
+            return;
+        }
+        if (isEmpty(richTextReg)) {
             this.setText(richTextSrc);
             return;
         }
@@ -332,6 +335,10 @@ public final class CTextView extends TextView {
         }
 
         while (m.find()) {
+
+            if (m.start() < 0) {
+                continue;
+            }
             resultSpan.setSpan(new ForegroundColorSpan(richValueColor),
                     m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
@@ -432,4 +439,9 @@ public final class CTextView extends TextView {
     public interface ClickAction {
         void onClick(String s);
     }
+
+    public static boolean isEmpty(String src) {
+        return src == null || src.length() == 0 || src.trim().length() == 0 || TextUtils.equals(src.trim(), "null");
+    }
+
 }
