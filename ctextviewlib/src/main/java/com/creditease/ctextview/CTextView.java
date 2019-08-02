@@ -117,11 +117,11 @@ public final class CTextView extends TextView {
         setDrawablePadding(drawablePadding);
         setBtnDrawable();
 
-        //设置按钮点击之后的颜色更换
-        setOnTouchListener((arg0, event) -> {
-            setBackgroundDrawable(gradientDrawable);
-            return setColor(event.getAction());
-        });
+        //TODO 设置按钮点击之后的颜色更换 去掉按压效果
+        //setOnTouchListener((arg0, event) -> {
+        //    setBackgroundDrawable(gradientDrawable);
+        //    return setColor(event.getAction());
+        //});
 
         //资源回收
         a.recycle();
