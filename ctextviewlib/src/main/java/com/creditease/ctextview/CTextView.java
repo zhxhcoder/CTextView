@@ -123,6 +123,7 @@ public final class CTextView extends TextView {
         //    return setColor(event.getAction());
         //});
 
+
         //资源回收
         a.recycle();
     }
