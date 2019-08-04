@@ -84,19 +84,6 @@ public final class CTextView extends TextView {
 
         defaultTextColor = this.getCurrentTextColor();
 
-        if (pressedTextColor == Color.TRANSPARENT) {
-            pressedTextColor = defaultTextColor;
-        }
-        if (clickTextColor == Color.TRANSPARENT) {
-            clickTextColor = defaultTextColor;
-        }
-
-        if (pressedColor == Color.TRANSPARENT) {
-            if (cSolidColor != Color.TRANSPARENT) {
-                pressedColor = cSolidColor;
-            }
-        }
-
         if (drawablePadding != 0) {
             this.setGravity(Gravity.CENTER);
         }
@@ -206,7 +193,6 @@ public final class CTextView extends TextView {
 
     //除去Angle还原为默认
     public void resetExAngle() {
-        pressedColor = Color.TRANSPARENT;
         cSolidColor = Color.TRANSPARENT;
         strokeColor = Color.TRANSPARENT;
 
