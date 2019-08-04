@@ -36,9 +36,6 @@ public final class CTextView extends TextView {
     //关键属性设置
     private int cSolidColor = Color.TRANSPARENT;
     private int strokeColor = Color.TRANSPARENT;
-    private int pressedColor = Color.TRANSPARENT;
-    private int pressedTextColor = Color.TRANSPARENT;
-    private int clickTextColor = Color.TRANSPARENT;
     private int angleCorner = 0;
     private int strokeWidth = 0;
 
