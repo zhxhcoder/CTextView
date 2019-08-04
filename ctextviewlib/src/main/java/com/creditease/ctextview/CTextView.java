@@ -75,9 +75,6 @@ public final class CTextView extends TextView {
     private void init(Context context, AttributeSet attrs) {
         this.setEnabled(false); //默认不可用 当注册点击事件
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CTextView);
-        pressedColor = a.getColor(R.styleable.CTextView_CPressedColor, pressedColor);
-        pressedTextColor = a.getColor(R.styleable.CTextView_CPressedTextColor, pressedTextColor);
-        clickTextColor = a.getColor(R.styleable.CTextView_CClickTextColor, clickTextColor);
         cSolidColor = a.getColor(R.styleable.CTextView_CSolidColor, cSolidColor);
         strokeColor = a.getColor(R.styleable.CTextView_CStrokeColor, strokeColor);
         angleCorner = a.getDimensionPixelSize(R.styleable.CTextView_CAngleCorner, angleCorner);
