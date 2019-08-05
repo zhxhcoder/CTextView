@@ -19,7 +19,6 @@ import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -215,26 +214,6 @@ public final class CTextView extends TextView {
     }
 
 
-    //处理按下去的颜色 区分solid和stroke模式
-    public boolean setColor(int action) {
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                gradientDrawable.setColor(pressedColor);
-                this.setTextColor(pressedTextColor);
-                break;
-            case MotionEvent.ACTION_UP:
-                gradientDrawable.setColor(cSolidColor);
-                this.setTextColor(defaultTextColor);
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                gradientDrawable.setColor(cSolidColor);
-                this.setTextColor(defaultTextColor);
-                break;
-        }
-
-        return false;
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         float lastDegrees = degrees % 360;//优化大于360度情况
@@ -371,11 +350,9 @@ public final class CTextView extends TextView {
     }
 
 
-    public void initBtnAttr(int solidColor, int strokeColor, int pressedColor, int pressedTextColor, int angleCorner, int strokeWidth) {
+    public void initBtnAttr(int solidColor, int strokeColor, int angleCorner, int strokeWidth) {
         this.cSolidColor = solidColor;
         this.strokeColor = strokeColor;
-        this.pressedColor = pressedColor;
-        this.pressedTextColor = pressedTextColor;
         this.angleCorner = angleCorner;
         this.strokeWidth = strokeWidth;
         setBtnDrawable();
@@ -385,22 +362,22 @@ public final class CTextView extends TextView {
     //初始化 默认
     public void initSolidArr(int textColor, int solidColor, int angleCorner) {
         resetExAngle();
-        initBtnAttr(solidColor, strokeColor, solidColor, textColor, angleCorner, strokeWidth);
+        initBtnAttr(solidColor, strokeColor, angleCorner, strokeWidth);
         setTextColor(textColor);
     }
 
 
     //初始化空心的
-    public void initStrokeAttr(int textColor, int strokeColor, int pressedColor, int strokeWidth, int angleCorner) {
+    public void initStrokeAttr(int textColor, int strokeColor, int strokeWidth, int angleCorner) {
         resetExAngle();
-        initBtnAttr(cSolidColor, strokeColor, pressedColor, pressedTextColor, angleCorner, strokeWidth);
+        initBtnAttr(cSolidColor, strokeColor, angleCorner, strokeWidth);
         setTextColor(textColor);
     }
 
     //stockColor等于textColor等于pressColor等于pressTextColor
     public void initStrokeAttr(int strokeColor, int strokeWidth, int angleCorner) {
         resetExAngle();
-        initBtnAttr(cSolidColor, strokeColor, pressedColor, strokeColor, angleCorner, strokeWidth);
+        initBtnAttr(cSolidColor, strokeColor, angleCorner, strokeWidth);
         setTextColor(strokeColor);
     }
 
@@ -408,13 +385,6 @@ public final class CTextView extends TextView {
     public void setTextColor(int color) {
         super.setTextColor(color);
         defaultTextColor = color;
-
-        if (pressedTextColor == Color.TRANSPARENT) {
-            pressedTextColor = defaultTextColor;
-        }
-        if (clickTextColor == Color.TRANSPARENT) {
-            clickTextColor = defaultTextColor;
-        }
     }
 
     public interface ClickAction {
