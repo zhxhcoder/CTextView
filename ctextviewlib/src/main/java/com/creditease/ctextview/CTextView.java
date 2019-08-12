@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by zhxh on 2019/06/25
+ * 可以参考 https://github.com/JavaNoober/BackgroundLibrary
  */
 public final class CTextView extends TextView {
 
