@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 /**
  * Created by zhxh on 2019/08/12
+ * 可自定义四个角
  */
 public class CShapeImageView extends ImageView {
 
