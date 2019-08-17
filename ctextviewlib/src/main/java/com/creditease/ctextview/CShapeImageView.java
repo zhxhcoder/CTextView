@@ -74,6 +74,7 @@ public class CShapeImageView extends ImageView {
         invalidate();
     }
 
+    //左上
     private void drawLeftUp(Canvas canvas) {
         Path path = new Path();
         path.moveTo(0, roundHeight);
