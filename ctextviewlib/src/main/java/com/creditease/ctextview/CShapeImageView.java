@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 /**
  * Created by zhxh on 2019/08/12
+ * 可自定义四个角
  */
 public class CShapeImageView extends ImageView {
 
@@ -73,6 +74,7 @@ public class CShapeImageView extends ImageView {
         invalidate();
     }
 
+    //左上
     private void drawLeftUp(Canvas canvas) {
         Path path = new Path();
         path.moveTo(0, roundHeight);
