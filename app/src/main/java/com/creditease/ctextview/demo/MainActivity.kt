@@ -7,8 +7,17 @@ import com.creditease.ctextview.demo.test.BaseFinanceNetResp
 import com.creditease.ctextview.demo.test.FortuneCardListInfo
 import com.creditease.ctextview.demo.test.YiriCardData
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
+import com.google.gson.JsonParser
+import com.google.gson.JsonObject
+import android.support.v4.app.SupportActivity
+import android.support.v4.app.SupportActivity.ExtraData
+import android.support.v4.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.creditease.ctextview.demo.test.DataMap
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,17 +26,27 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val resultStr =
-            """{"data":{"answerType":8,"data":[{"text":"xxxxx"}]},"errorCode":"","msg":"","result":"success"}"""
+            """{"这个是啥":{"answerType":8,"list":[{"text":"xxxxx"}]},"errorCode":"","msg":"","result":"success"}"""
+
+        val resultStrMap =
+            """{"data":{"帮我分析":[{"answerType":1005,"name":"专属人工管家11111112","pic":"图片地址"}],"帮我理财":[{"answerType":1005,"name":"专属人工管家12","pic":"图片地址"}],"帮我选品":[{"answerType":1005,"name":"专属人工管家12","pic":"图片地址"}]},"errorCode":"","msg":"","result":"success"}"""
         val mGson = Gson()
         val type0 = object : TypeToken<List<YiriCardData>>() {}.type
         val type1 = object : TypeToken<BaseFinanceNetResp<YiriCardData>>() {}.type
+        val typeMap = object : TypeToken<BaseFinanceNetResp<DataMap>>() {}.type
+
 
         //val strList1 =
         //    Regex("""(?<=帮我分析.{2})\[[^\]]+\]""").find(resultStr)?.groupValues?.get(0) ?: ""
         //val tags1: List<YiriCardData> = mGson.fromJson<List<YiriCardData>>(strList1, type0)
 
-        val resp1 = mGson.fromJson<BaseFinanceNetResp<YiriCardData>>(resultStr, type1)
-        tstTxt.text =resp1.data.data[0].text
+        val jsonObject = JsonParser().parse(resultStr).asJsonObject
+        val jsonData =jsonObject.getAsJsonObject("这个是啥")
+
+        val respMap = Gson().fromJson<BaseFinanceNetResp<DataMap>?>(resultStrMap, typeMap)
+
+
+        tstTxt.text = respMap!!.data.帮我分析[0].name
 
 
         ctvTest.setOnClickListener {
