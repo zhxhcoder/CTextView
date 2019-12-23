@@ -26,14 +26,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val resultStr =
-            """{"这个是啥":{"answerType":8,"list":[{"text":"xxxxx"}]},"errorCode":"","msg":"","result":"success"}"""
+            """["1111","2222","3333"]"""
 
         val resultStrMap =
-            """{"data":{"帮我分析":[{"answerType":1005,"name":"专属人工管家11111112","pic":"图片地址"}],"帮我理财":[{"answerType":1005,"name":"专属人工管家12","pic":"图片地址"}],"帮我选品":[{"answerType":1005,"name":"专属人工管家12","pic":"图片地址"}]},"errorCode":"","msg":"","result":"success"}"""
+            """{"data":{"帮我分析":[{"answerType":1005,"name":"专属人工管家11111112","pic":"图片地址"}],"帮我理财":[{"answerType":1005,"name":"专属人2","pic":"图片地址"}],"帮我选品":[{"answerType":1005,"name":"专属人工管家12","pic":"图片地址"}]},"errorCode":"","msg":"","result":"success"}"""
         val mGson = Gson()
         val type0 = object : TypeToken<List<YiriCardData>>() {}.type
         val type1 = object : TypeToken<BaseFinanceNetResp<YiriCardData>>() {}.type
-        val typeMap = object : TypeToken<BaseFinanceNetResp<DataMap>>() {}.type
+        val typeMap = object : TypeToken<BaseFinanceNetResp<Map<String,List<YiriCardData>>>>() {}.type
 
 
         //val strList1 =
@@ -43,10 +43,10 @@ class MainActivity : AppCompatActivity() {
         val jsonObject = JsonParser().parse(resultStr).asJsonObject
         val jsonData =jsonObject.getAsJsonObject("这个是啥")
 
-        val respMap = Gson().fromJson<BaseFinanceNetResp<DataMap>?>(resultStrMap, typeMap)
+        val respMap = Gson().fromJson<BaseFinanceNetResp<Map<String,List<YiriCardData>>>?>(resultStrMap, typeMap)
 
 
-        tstTxt.text = respMap!!.data.帮我分析[0].name
+        tstTxt.text = respMap!!.data.get("帮我理财")?.get(0)?.name ?: ""
 
 
         ctvTest.setOnClickListener {
