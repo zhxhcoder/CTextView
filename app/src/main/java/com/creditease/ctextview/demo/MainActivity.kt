@@ -7,16 +7,9 @@ import com.creditease.ctextview.demo.test.BaseFinanceNetResp
 import com.creditease.ctextview.demo.test.FortuneCardListInfo
 import com.creditease.ctextview.demo.test.YiriCardData
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.gson.JsonParser
-import com.google.gson.JsonObject
-import android.support.v4.app.SupportActivity
-import android.support.v4.app.SupportActivity.ExtraData
-import android.support.v4.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import com.creditease.ctextview.demo.test.DataMap
 
 
 class MainActivity : AppCompatActivity() {
