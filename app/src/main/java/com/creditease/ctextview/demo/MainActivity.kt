@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
             .withRegex("bold")
             .withColor(Color.BLUE)
             .withSize(20)
+            .withBold(true)
             .withBack {
 
             }

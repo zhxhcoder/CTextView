@@ -17,6 +17,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -267,9 +268,10 @@ public final class CTextView extends TextView {
         this.bold = bold;
         return this;
     }
+
     public void withBack(ClickAction cb) {
         this.setEnabled(true);
-        setSpecialText(richTextSrc, richTextReg, richValueColor, richValueSize, cb);
+        setSpecialText(richTextSrc, richTextReg, richValueColor, richValueSize, bold, cb);
     }
 
     @Override
@@ -279,7 +281,7 @@ public final class CTextView extends TextView {
     }
 
     //根据正则用来 处理特殊字符串的特殊颜色或大小及点击事件
-    public void setSpecialText(String richTextSrc, String richTextReg, int richValueColor, int richValueSize, ClickAction cb) {
+    public void setSpecialText(String richTextSrc, String richTextReg, int richValueColor, int richValueSize, boolean bold, ClickAction cb) {
         if (isEmpty(richTextSrc)) {
             return;
         }
@@ -303,14 +305,26 @@ public final class CTextView extends TextView {
         while (m.find()) {
 
             if (m.start() < 0) {
-                continue;
+                this.setText(richTextSrc);
+                return;
             }
+
+            if (m.end() >= richTextSrc.length()) {
+                this.setText(richTextSrc);
+                return;
+            }
+
             resultSpan.setSpan(new ForegroundColorSpan(richValueColor),
                     m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             if (richValueSize != 0) {
                 resultSpan.setSpan(new AbsoluteSizeSpan(richValueSize, true), m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
+
+            if (bold) {
+                resultSpan.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
             if (cb != null) {
                 int finalRichValueColor = richValueColor;
                 resultSpan.setSpan(new ClickableSpan() {
@@ -324,9 +338,12 @@ public final class CTextView extends TextView {
 
                     @Override
                     public void onClick(View widget) {
-
                         CTextView.this.setHighlightColor(Color.TRANSPARENT);
-                        cb.onClick(m.group());
+                        if (isEmpty(m.group())) {
+                            cb.onClick("");
+                        } else {
+                            cb.onClick(m.group());
+                        }
 
                     }
                 }, m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
