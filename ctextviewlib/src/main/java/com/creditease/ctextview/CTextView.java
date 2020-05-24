@@ -229,6 +229,7 @@ public final class CTextView extends TextView {
     private String richTextReg = "";
     private int richValueColor;
     private int richValueSize;
+    private boolean bold;
 
 
     public CTextView withText(String richTextSrc) {
@@ -262,6 +263,10 @@ public final class CTextView extends TextView {
         return this;
     }
 
+    public CTextView withBold(boolean bold) {
+        this.bold = bold;
+        return this;
+    }
     public void withBack(ClickAction cb) {
         this.setEnabled(true);
         setSpecialText(richTextSrc, richTextReg, richValueColor, richValueSize, cb);
