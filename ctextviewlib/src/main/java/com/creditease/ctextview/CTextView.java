@@ -339,12 +339,7 @@ public final class CTextView extends TextView {
                     @Override
                     public void onClick(View widget) {
                         CTextView.this.setHighlightColor(Color.TRANSPARENT);
-                        if (isEmpty(m.group())) {
-                            cb.onClick("");
-                        } else {
-                            cb.onClick(m.group());
-                        }
-
+                        cb.onClick("");
                     }
                 }, m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
