@@ -69,7 +69,7 @@ public class RxjavaActivity extends AppCompatActivity {
                     public ObservableSource<Integer> apply(Integer integer) throws Exception {
                         //模拟网络请求
                         Thread.sleep(3000);
-                        return null;
+                        return Observable.fromArray(integer);
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -79,11 +79,8 @@ public class RxjavaActivity extends AppCompatActivity {
                     public void accept(Integer integer) throws Exception {
                         //TODO
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
+                }, throwable -> {
 
-                    }
                 }));
 
 
