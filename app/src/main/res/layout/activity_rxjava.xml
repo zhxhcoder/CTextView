@@ -10,4 +10,10 @@
         android:id="@+id/editTest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:id="@+id/flatMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

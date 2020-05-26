@@ -23,20 +23,16 @@ public class RxjavaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rxjava);
-
         initPublishSubject();
 
         editTest = findViewById(R.id.editTest);
-
         editTest.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
@@ -48,11 +44,9 @@ public class RxjavaActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     private void initPublishSubject() {
-
         mSubject = PublishSubject.create();
         disposable = mSubject.debounce(500, TimeUnit.MILLISECONDS) // 这里设置了300ms的限制
                 .subscribe(new Consumer<String>() {
