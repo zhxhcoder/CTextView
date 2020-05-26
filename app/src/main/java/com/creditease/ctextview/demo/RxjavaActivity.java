@@ -7,17 +7,26 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 public class RxjavaActivity extends AppCompatActivity {
     EditText editTest;
-    Disposable disposable;
+    TextView flatMap;
     PublishSubject<String> mSubject;
+
+    private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +53,45 @@ public class RxjavaActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+        disposables.add(Observable.just(1, 2)
+                .map(new Function<Integer, Integer>() {
+                    @Override
+                    public Integer apply(Integer integer) throws Exception {
+                        //模拟网络请求
+                        Thread.sleep(5000);
+                        return 1;
+                    }
+                })
+                .flatMap(new Function<Integer, ObservableSource<Integer>>() {
+                    @Override
+                    public ObservableSource<Integer> apply(Integer integer) throws Exception {
+                        //模拟网络请求
+                        Thread.sleep(3000);
+                        return null;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        //TODO
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                }));
+
+
     }
 
     private void initPublishSubject() {
         mSubject = PublishSubject.create();
-        disposable = mSubject.debounce(500, TimeUnit.MILLISECONDS) // 这里设置了300ms的限制
+        disposables.add(mSubject.debounce(500, TimeUnit.MILLISECONDS) // 这里设置了300ms的限制
                 .subscribe(new Consumer<String>() {
                     @Override
                     public void accept(String keyword) throws Exception {// 这里会收到被限流后onNext发出的事件，过滤掉未到300ms发出的事件
@@ -58,13 +101,13 @@ public class RxjavaActivity extends AppCompatActivity {
                             Log.d("xxxx-2", keyword);
                         }
                     }
-                });
+                }));
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disposable.dispose();
+        disposables.clear();
     }
 }
