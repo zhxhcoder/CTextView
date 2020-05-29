@@ -88,11 +88,8 @@ public class RxjavaActivity extends AppCompatActivity {
 
 
         flatMap.setOnClickListener(v -> {
-            SnackbarUtil.LongSnackbar(snackBar, "1妹子向你发来一条消息\n妹子向你发来一条消息\n妹子向你发来一条消息", SnackbarUtil.Info).show();
         });
-        snackBar.setOnClickListener(v -> {
-            SnackbarUtil.LongSnackbar(snackBar, "2妹子向你发来一条消息\n妹子向你发来一条消息\n妹子向你发来一条消息", SnackbarUtil.Info).show();
-        });
+
     }
 
     private void initPublishSubject() {
