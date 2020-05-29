@@ -23,6 +23,7 @@ import io.reactivex.subjects.PublishSubject;
 public class RxjavaActivity extends AppCompatActivity {
     EditText editTest;
     TextView flatMap;
+    TextView snackBar;
     PublishSubject<String> mSubject;
 
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -34,6 +35,9 @@ public class RxjavaActivity extends AppCompatActivity {
         initPublishSubject();
 
         editTest = findViewById(R.id.editTest);
+        flatMap = findViewById(R.id.flatMap);
+        snackBar = findViewById(R.id.snackBar);
+
         editTest.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -83,6 +87,12 @@ public class RxjavaActivity extends AppCompatActivity {
                 }));
 
 
+        flatMap.setOnClickListener(v -> {
+            SnackbarUtil.LongSnackbar(snackBar, "1妹子向你发来一条消息\n妹子向你发来一条消息\n妹子向你发来一条消息", SnackbarUtil.Info).show();
+        });
+        snackBar.setOnClickListener(v -> {
+            SnackbarUtil.LongSnackbar(snackBar, "2妹子向你发来一条消息\n妹子向你发来一条消息\n妹子向你发来一条消息", SnackbarUtil.Info).show();
+        });
     }
 
     private void initPublishSubject() {
