@@ -58,6 +58,10 @@ public class RxjavaActivity extends AppCompatActivity {
         });
 
 
+        //请求命令时
+
+        //第二次提交吧
+
         disposables.add(Observable.just(1, 2)
                 .map(new Function<Integer, Integer>() {
                     @Override
